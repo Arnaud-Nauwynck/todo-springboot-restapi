@@ -1,5 +1,9 @@
 package com.example.demo.rest;
 
+import com.example.demo.entity.TodoEntity;
+import com.example.demo.service.TodoService;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,46 +13,21 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/todo")
+@RequiredArgsConstructor
 public class TodoRestController {
 
-    public static class Todo {
-        public int id;
-        public String title;
-        public String description;
-        public int priority;
-
-        public Todo() {
-        }
-
-        public Todo(int id, String title, String description, int priority) {
-            this.id = id;
-            this.title = title;
-            this.description = description;
-            this.priority = priority;
-        }
-    }
-
-    private int idGenerator = 1;
-    private int newId() {
-        return idGenerator++;
-    }
-
-    protected List<Todo> todos = new ArrayList<>(List.of(
-            new Todo(newId(), "Learn Java", "", 1),
-            new Todo(newId(), "Learn SpringBoot", "", 2),
-            new Todo(newId(), "Learn Rest Spring-Web", "", 3)
-    ));
+    private final TodoService delegate;
 
     // READ - Get all todos
     @GetMapping
-    public List<Todo> getAll() {
-        return todos;
+    public List<TodoEntity> getAll() {
+        return delegate.getAll();
     }
 
     // READ - Get todo by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Todo> getById(@PathVariable int id) {
-        Todo todo = todos.stream().filter(t -> t.id == id).findFirst().orElse(null);
+    public ResponseEntity<TodoEntity> getById(@PathVariable int id) {
+        TodoEntity todo = delegate.getById(id);
         if (todo == null) {
             return ResponseEntity.notFound().build();
         }
@@ -57,44 +36,38 @@ public class TodoRestController {
 
     // CREATE - Add new todo
     @PostMapping
-    public ResponseEntity<Todo> create(@RequestBody Todo todo) {
+    public ResponseEntity<TodoEntity> create(@RequestBody TodoEntity todo) {
         if (todo == null) {
             return ResponseEntity.badRequest().build();
         }
-        todo.id = newId(); // Assign new ID
-        todos.add(todo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(todo);
+        val res = delegate.createTodo(todo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(res);
     }
 
     // UPDATE - Update existing todo
     @PutMapping()
-    public ResponseEntity<Todo> update(@RequestBody Todo updatedTodo) {
+    public ResponseEntity<TodoEntity> update(@RequestBody TodoEntity updatedTodo) {
         if (updatedTodo == null) {
             return ResponseEntity.badRequest().build();
         }
-        int id = updatedTodo.id;
-        boolean removed = todos.removeIf(t -> t.id == id);
-        if (!removed) {
-            return ResponseEntity.notFound().build();
-        }
-        todos.add(updatedTodo);
-        return ResponseEntity.ok(updatedTodo);
+        val res = delegate.updateTodo(updatedTodo);
+        return ResponseEntity.ok(res);
     }
 
-    // DELETE - Delete todo by ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        boolean removed = todos.removeIf(t -> t.id == id);
-        if (removed) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
+//    // DELETE - Delete todo by ID
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> delete(@PathVariable int id) {
+//        boolean removed = todos.removeIf(t -> t.id == id);
+//        if (removed) {
+//            return ResponseEntity.noContent().build();
+//        }
+//        return ResponseEntity.notFound().build();
+//    }
 
-    // DELETE - Delete all todos
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAll() {
-        todos.clear();
-        return ResponseEntity.noContent().build();
-    }
+//    // DELETE - Delete all todos
+//    @DeleteMapping
+//    public ResponseEntity<Void> deleteAll() {
+//        todos.clear();
+//        return ResponseEntity.noContent().build();
+//    }
 }
