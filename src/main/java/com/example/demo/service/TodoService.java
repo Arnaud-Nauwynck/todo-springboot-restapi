@@ -26,7 +26,7 @@ public class TodoService {
             saveTodo("Learn Java");
             saveTodo("Learn SpringBoot");
             saveTodo("Learn Rest Spring-Web");
-            for(int i = 1; i < 10_000; i++) {
+            for(int i = 1; i < 100; i++) {
                 saveTodo("Sample Todo " + i);
             }
 
