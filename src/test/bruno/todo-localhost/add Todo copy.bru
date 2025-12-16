@@ -1,0 +1,18 @@
+meta {
+  name: add Todo copy
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/api/todo
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "test from Brunon 2",
+    "description": "test from Bruno 2"
+  }
+}

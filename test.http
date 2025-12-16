@@ -1,0 +1,14 @@
+### GET request
+GET http://localhost:8080/api/todo
+Accept: application/json
+
+### POST request
+POST http://localhost:8080/api/todo
+Content-Type: application/json
+
+{
+  "title": "Learn SpringBoot",
+  "description": "Learn SpringBoot",
+  "priority": 2
+}
+###
